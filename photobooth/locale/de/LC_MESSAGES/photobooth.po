@@ -29,7 +29,7 @@ msgstr "Photobooth"
 
 #: photobooth/gui/Qt5Gui/Frames.py:87
 msgid "Hit the"
-msgstr "Drück' den"
+msgstr "Drücke den"
 
 #: photobooth/gui/Qt5Gui/Frames.py:88
 msgid "Button!"
@@ -53,7 +53,7 @@ msgstr "Foto {} von {}..."
 
 #: photobooth/gui/Qt5Gui/Frames.py:342
 msgid "Start over"
-msgstr "Nochmal"
+msgstr "Lieber nicht drucken"
 
 #: photobooth/gui/Qt5Gui/Frames.py:351
 msgid "Happy?"
@@ -255,3 +255,6 @@ msgstr "Bestätigung"
 msgid "Quit Photobooth?"
 msgstr "Photobooth beenden?"
 
+#: GuiPostprocessor.py:112
+msgid "Print"
+msgstr "Drucken!"
