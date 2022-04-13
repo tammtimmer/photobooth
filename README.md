@@ -1,6 +1,39 @@
 # photobooth
 
-[![Buy me a coffee](https://www.buymeacoffee.com/assets/img/custom_images/black_img.png)](https://www.buymeacoffee.com/reuterbal)
+This is a fork from the original photobooth software (https://github.com/reuterbal/photobooth)
+
+I use feature-branches for different things added. All get merged in the [mydev](https://github.com/t0mmo/photobooth/tree/mydev) branch. The master and development branches tend to reflect the original repository
+
+## Additional Features
+* [optimizedshotfilenames](https://github.com/t0mmo/photobooth/tree/optimizedshotfilenames) is an attempt to make the naming of shots and final pictures easier to understand. Eg the shots corresponding to photo001.jpg are now called photo001_shot1.jpg, photo001_shot2.jpg etc. See PR reuterbal/photobooth#164
+* [fancytemplates](https://github.com/t0mmo/photobooth/tree/fancytemplates) allow for a much more flexible design of the templates.
+
+### Fancy Templates
+
+The templates are defined in XML. The XML file descibes size&color of the background. On top each XML tag adds an element on top of the others:
+* `Image` can be PNG (incl transparency if required) or JPG etc and should be the same size like defined in the background. Can be used for a picture background or final overlay ontop of photos.
+* `Photo` refers to a shot taken by the camera. Positioning, resizing, rotation are supported currently. Make sure shots are numbered correctly!
+
+Currently, three examples are provided: 
+* `standard_2x2.xml` mimics the current behaviour of composing 2x2 photos on a white back. <img alt="Example for standard 2x2 template" title="Standard 2x2 template" src="supplementals/templates/standard_2x2-result.jpg" width="280" />
+* `example.xml` is a showcase for current capabilities (sorry for my limited design skills). Curious to see what others come up with! <img alt="Example for example template" title="Example template" src="supplementals/templates/example-result.jpg" width="280" />
+* `photostrips.xml` is another showcase for what's possible <img alt="Example for photostrips template" title="Photostrips template" src="supplementals/templates/photostrips-result.jpg" width="280" />
+
+To test & develop further templates the templating can be called directly from the CLI:
+```
+python -m photobooth.template.FancyTemplate -t .\supplementals\templates\example.xml
+```
+`-h` provides a short help
+
+#### Further ideas for optimization 
+(Please add/prioritize)
+* [ ] caching of photo manipulations to increase speed
+* [ ] resizing of image tag
+* [ ] text tag to add text labels (almost same can be achieved by final overlay image including the text)
+
+---
+
+[![Buy me a coffee](https://www.buymeacoffee.com/assets/img/custom_images/black_img.png)](  )
 
 A flexible Photobooth software.
 
