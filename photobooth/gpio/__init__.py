@@ -35,34 +35,45 @@ class Gpio:
         self._gpio = None
 
         self._is_trigger = False
-        self._is_enabled = config.getBool('Gpio', 'enable')
+        self._is_enabled_button = config.getBool('Gpio', 'enable_button')
+        self._is_enabled_light = config.getBool('Gpio', 'enable_light')
         self._countdown_time = config.getInt('Photobooth', 'countdown_time')
 
         self.initGpio(config)
 
     def initGpio(self, config):
 
-        if self._is_enabled:
+        if self._is_enabled_button or self._is_enabled_light:
             self._gpio = Entities()
 
-            lamp_pin = config.getInt('Gpio', 'lamp_pin')
+        if self._is_enabled_button:
             trigger_pin = config.getInt('Gpio', 'trigger_pin')
             exit_pin = config.getInt('Gpio', 'exit_pin')
+            
+            self._gpio.setButton(trigger_pin, self.trigger)
+            self._gpio.setButton(exit_pin, self.exit)
+            
+            logging.info(('GPIO enabled (trigger_pin=%d, '
+                          'exit_pin=%d)'), trigger_pin, exit_pin)
 
+        else:
+            logging.info('GPIO buttons disabled')
+
+        if self._is_enabled_light:
+            lamp_pin = config.getInt('Gpio', 'lamp_pin')
             rgb_pin = (config.getInt('Gpio', 'chan_r_pin'),
                        config.getInt('Gpio', 'chan_g_pin'),
                        config.getInt('Gpio', 'chan_b_pin'))
 
-            logging.info(('GPIO enabled (lamp_pin=%d, trigger_pin=%d, '
-                         'exit_pin=%d, rgb_pins=(%d, %d, %d))'),
-                         lamp_pin, trigger_pin, exit_pin, *rgb_pin)
-
-            self._gpio.setButton(trigger_pin, self.trigger)
-            self._gpio.setButton(exit_pin, self.exit)
             self._lamp = self._gpio.setLamp(lamp_pin)
             self._rgb = self._gpio.setRgb(rgb_pin)
+
+            logging.info(('GPIO enabled (lamp_pin=%d, '
+                          'rgb_pins=(%d, %d, %d))'),
+                          lamp_pin, *rgb_pin)
+
         else:
-            logging.info('GPIO disabled')
+            logging.info('GPIO light disabled')
 
     def run(self):
 
@@ -75,6 +86,8 @@ class Gpio:
 
         if isinstance(state, StateMachine.IdleState):
             self.showIdle()
+        elif isinstance(state, StateMachine.SlideshowState):
+            self.showSlideshow()
         elif isinstance(state, StateMachine.GreeterState):
             self.showGreeter()
         elif isinstance(state, StateMachine.CountdownState):
@@ -92,39 +105,43 @@ class Gpio:
 
     def teardown(self, state):
 
-        if self._is_enabled:
+        if self._is_enabled_light:
             self._gpio.teardown()
 
     def enableTrigger(self):
 
-        if self._is_enabled:
+        if self._is_enabled_button:
             self._is_trigger = True
+            
+        if self._is_enabled_light:
             self._gpio.lampOn(self._lamp)
 
     def disableTrigger(self):
 
-        if self._is_enabled:
+        if self._is_enabled_button:
             self._is_trigger = False
+            
+        if self._is_enabled_light:
             self._gpio.lampOff(self._lamp)
 
     def setRgbColor(self, r, g, b):
 
-        if self._is_enabled:
+        if self._is_enabled_light:
             self._gpio.rgbColor(self._rgb, (r, g, b))
 
     def rgbOn(self):
 
-        if self._is_enabled:
+        if self._is_enabled_light:
             self._gpio.rgbOn(self._rgb)
 
     def rgbOff(self):
 
-        if self._is_enabled:
+        if self._is_enabled_light:
             self._gpio.rgbOff(self._rgb)
 
     def rgbBlink(self):
 
-        if self._is_enabled:
+        if self._is_enabled_light:
             self._gpio.rgbBlink(self._rgb, 0.5, 0.5, 0.1, 0.1, (1, 0, 0),
                                 (0, 0, 0), None)  # self._countdown_time)
             # Note: blinking forever instead of countdown_time to overcome
@@ -146,13 +163,17 @@ class Gpio:
 
         self.enableTrigger()
 
-        if self._is_enabled:
+        if self._is_enabled_light:
             h, s, v = 0, 1, 1
             while self._comm.empty(Workers.GPIO):
                 h = (h + 1) % 360
                 rgb = hsv_to_rgb(h / 360, s, v)
                 self.setRgbColor(*rgb)
                 sleep(0.1)
+
+    def showSlideshow(self):
+
+        self.enableTrigger()
 
     def showGreeter(self):
 

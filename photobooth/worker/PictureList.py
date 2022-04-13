@@ -22,6 +22,7 @@ import logging
 import os.path
 from glob import glob
 
+import random
 
 class PictureList:
     """A simple helper class.
@@ -49,6 +50,11 @@ class PictureList:
             os.makedirs(dirname)
 
         self.findExistingFiles()
+        
+        # Print initial infos
+        logging.info('Number of last existing file: %d', self.counter)
+        logging.info('Saving pictures as "%s%s.%s"', self.basename,
+                     self.count_width * 'X', 'jpg')
 
     def findExistingFiles(self):
         """Count number of existing files matchin the given basename
@@ -56,7 +62,7 @@ class PictureList:
         # Find existing files
         count_pattern = '[0-9]' * self.count_width
         pictures = glob(self.basename + count_pattern + self.suffix)
-
+    
         # Get number of latest file
         if len(pictures) == 0:
             self.counter = 0
@@ -65,11 +71,6 @@ class PictureList:
             last_picture = pictures[-1]
             self.counter = int(last_picture[
                 -(self.count_width + len(self.suffix)):-len(self.suffix)])
-
-        # Print initial infos
-        logging.info('Number of last existing file: %d', self.counter)
-        logging.info('Saving pictures as "%s%s.%s"', self.basename,
-                     self.count_width * 'X', 'jpg')
 
     @property
     def basename(self):
@@ -99,3 +100,12 @@ class PictureList:
         """Update counter and return the next filename"""
         self.shot_counter += 1
         return self.getFilenameShot(self.counter, self.shot_counter)
+
+    def getRandomPic(self):
+        """Return a random filename """
+        
+        self.findExistingFiles()
+        if self.counter == 0:
+            return self.getFilename(0)
+        else:
+            return self.getFilename(random.randrange(self.counter)+1)

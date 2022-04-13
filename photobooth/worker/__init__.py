@@ -28,7 +28,6 @@ from .PictureList import PictureList
 from .PictureMailer import PictureMailer
 from .PictureSaver import PictureSaver
 from .PictureUploadWebdav import PictureUploadWebdav
-from .PictureList import PictureList
 
 
 class Worker:

@@ -26,8 +26,11 @@ from PyQt5 import QtWidgets
 
 from PIL import Image, ImageQt
 
+from time import localtime, strftime, sleep
+
 from ...StateMachine import GuiEvent, TeardownEvent
 from ...Threading import Workers
+from ...worker.PictureList import PictureList
 
 from ..GuiSkeleton import GuiSkeleton
 from ..GuiPostprocessor import GuiPostprocessor
@@ -53,6 +56,16 @@ class PyQt5Gui(GuiSkeleton):
         self._picture = None
         self._postprocess = GuiPostprocessor(self._cfg)
 
+        self._createTimer()
+        # Picture naming convention for assembled pictures
+        path = os.path.join(config.get('Storage', 'basedir'),
+                            config.get('Storage', 'basename'))
+        basename = strftime(path, localtime())
+        self._pic_list = PictureList(basename)
+
+        self._default_size = (640,440)
+        self._lastslide = None
+        
     def run(self):
 
         exit_code = self._app.exec_()
@@ -114,6 +127,18 @@ class PyQt5Gui(GuiSkeleton):
 
         self._gui.setCentralWidget(widget)
 
+    def _createTimer(self):
+
+        self._timerStartSlideshow = QtCore.QTimer()
+        self._timerStartSlideshow.timeout.connect(lambda: self._comm.send(Workers.MASTER, GuiEvent('slideshow')))
+        self._timerViewSlides = QtCore.QTimer()
+        self._timerViewSlides.timeout.connect(lambda: self._comm.send(Workers.GUI, GuiEvent('updateslideshow')))
+
+    def _destroyTimer(self):
+        
+         QtCore.QObject.killTimer(self, self._timerStartSlideshow)
+         QtCore.QObject.killTimer(self, self._timerViewSlides)
+
     def close(self):
 
         if self._gui.close():
@@ -151,6 +176,8 @@ class PyQt5Gui(GuiSkeleton):
 
         self._disableTrigger()
         self._disableEscape()
+        self._timerViewSlides.stop()
+        self._timerStartSlideshow.stop()
         self._setWidget(Frames.Welcome(
             lambda: self._comm.send(Workers.MASTER, GuiEvent('start')),
             self._showSetDateTime, self._showSettings, self.close))
@@ -169,14 +196,65 @@ class PyQt5Gui(GuiSkeleton):
 
         self._enableEscape()
         self._enableTrigger()
+        self._timerViewSlides.stop()
+        
+        slideshow_time = self._cfg.getInt('Slideshow', 'start_slideshow_time') * 1000
+
         self._setWidget(Frames.IdleMessage(
             lambda: self._comm.send(Workers.MASTER, GuiEvent('trigger'))))
+        
+        self._timerStartSlideshow.setSingleShot(True)
+        self._timerStartSlideshow.start(slideshow_time)
 
+    def showSlideshow(self, state):
+
+        self._timerStartSlideshow.stop()
+        view_time = self._cfg.getInt('Slideshow', 'pic_slideshow_time') * 1000
+        logging.info('Start Slideshow')
+
+        logging.info('Picture Time {}'.format(view_time) )
+        # self._timerViewSlides.timeout.connect(lambda: self._comm.send(Workers.GUI, GuiEvent('updateslideshow')))
+        self._timerViewSlides.setSingleShot(False)
+        self._timerViewSlides.start(view_time)
+        
+        picturename = self._pic_list.getRandomPic()
+        logging.info('Picture name for slideshow {}'.format(picturename) )
+        if (self._pic_list.counter == 0) :
+            picture = Image.new('RGB',self._default_size,(128,128,128))
+            text = _('No slideshow yet...')
+        else :
+            while (not os.path.isfile(picturename)):
+                picturename = self._pic_list.getRandomPic()
+            picture = Image.open(picturename)
+            text = ('')
+        self._lastslide = picture
+        self._setWidget(Frames.SlideshowMessage(picture,text))
+        
+    def updateSlideshow(self, event):
+        
+        picturename = self._pic_list.getRandomPic()
+        logging.info('Picture name for slideshow {}'.format(picturename) )
+        # logging.info('Timer-ID "{}" \n '.format(self._timerViewSlides.timerId() ))
+        if (self._pic_list.counter == 0) :
+            picture = Image.new('RGB',self._default_size,(128,128,128))
+        else :
+            while (not os.path.isfile(picturename)):
+                picturename = self._pic_list.getRandomPic()
+            picture = Image.open(picturename)
+            
+        logging.info('Alpha {}'.format(round(self._gui.centralWidget().alpha,1)))
+        self._gui.centralWidget().alpha = 0.0
+        self._gui.centralWidget().slide = picture
+        self._gui.centralWidget().update()
+        
+        self._lastslide = picture
+        
     def showGreeter(self, state):
 
+        logging.info('Timer Remainig time"{}" '.format(self._timerStartSlideshow.remainingTime() ))
+        self._timerStartSlideshow.stop()
         self._enableEscape()
         self._disableTrigger()
-
         greeter_time = self._cfg.getInt('Photobooth', 'greeter_time') * 1000
         num_pics = state.num_pictures
         self._setWidget(Frames.GreeterMessage(
@@ -187,6 +265,7 @@ class PyQt5Gui(GuiSkeleton):
             lambda: self._comm.send(Workers.MASTER, GuiEvent('countdown')))
 
     def showCountdown(self, state):
+        logging.info(' ' )
 
         countdown_time = self._cfg.getInt('Photobooth', 'countdown_time')
         self._setWidget(Frames.CountdownMessage(
@@ -194,7 +273,6 @@ class PyQt5Gui(GuiSkeleton):
             lambda: self._comm.send(Workers.MASTER, GuiEvent('capture'))))
 
     def updateCountdown(self, event):
-
         picture = Image.open(event.picture)
         self._gui.centralWidget().picture = ImageQt.ImageQt(picture)
         self._gui.centralWidget().update()
