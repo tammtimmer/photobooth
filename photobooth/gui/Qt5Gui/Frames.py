@@ -233,7 +233,7 @@ class SlideshowMessage(QtWidgets.QFrame):
         self._alpha = alpha
 
     def showEvent(self, event):
-        self.startTimer(100)
+        self.startTimer(25)
 
     def timerEvent(self, event):
 

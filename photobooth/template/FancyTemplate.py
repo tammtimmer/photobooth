@@ -45,7 +45,7 @@ class AssemblyTask():
             img = img.crop((left_crop, 0, org_size[0]-left_crop, org_size[1]))
             logging.debug("resize too broad: %s %s %s %s %s %s", str(org_size), str(size), size_ratio, new_width, left_crop, str(img.size))
         # img.thumbnail(size)
-        img = img.resize(size)
+        img = img.resize(size, resample=Image.BICUBIC)
         return img
 
 
@@ -100,7 +100,7 @@ class PhotoAssemblyTask(AssemblyTask):
             #photo.thumbnail(self._size)
         if self._rotate != 0:
             photo = photo.convert('RGBA')
-            photo = photo.rotate(self._rotate, expand=True)
+            photo = photo.rotate(self._rotate, resample=Image.BICUBIC, expand=True)
             image.paste(photo, self._position, photo)
         else:
             image.paste(photo, self._position)

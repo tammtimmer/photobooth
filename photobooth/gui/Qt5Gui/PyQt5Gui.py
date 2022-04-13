@@ -26,7 +26,7 @@ from PyQt5 import QtWidgets
 
 from PIL import Image, ImageQt
 
-from time import localtime, strftime, sleep
+from time import localtime, strftime
 
 from ...StateMachine import GuiEvent, TeardownEvent
 from ...Threading import Workers
