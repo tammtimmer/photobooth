@@ -914,7 +914,7 @@ class Settings(QtWidgets.QFrame):
 
         enable_button = QtWidgets.QCheckBox()
         enable_button.setChecked(self._cfg.getBool('Gpio', 'enable_button'))
-        self.add('Gpio', 'enable', enable_button)
+        self.add('Gpio', 'enable_button', enable_button)
 
         exit_pin = QtWidgets.QSpinBox()
         exit_pin.setRange(1, 40)
@@ -1177,11 +1177,14 @@ class Settings(QtWidgets.QFrame):
         self._cfg.set('Storage', 'keep_pictures',
                       str(self.get('Storage', 'keep_pictures').isChecked()))
 
-        self._cfg.set('Gpio', 'enable',
-                      str(self.get('Gpio', 'enable').isChecked()))
+        self._cfg.set('Gpio', 'enable_button',
+                      str(self.get('Gpio', 'enable_button').isChecked()))
         self._cfg.set('Gpio', 'exit_pin', self.get('Gpio', 'exit_pin').text())
         self._cfg.set('Gpio', 'trigger_pin',
                       self.get('Gpio', 'trigger_pin').text())
+
+        self._cfg.set('Gpio', 'enable_light',
+                      str(self.get('Gpio', 'enable_light').isChecked()))
         self._cfg.set('Gpio', 'lamp_pin', self.get('Gpio', 'lamp_pin').text())
         self._cfg.set('Gpio', 'chan_r_pin',
                       self.get('Gpio', 'chan_r_pin').text())
