@@ -41,7 +41,7 @@ QFrame#IdleMessage QLabel {
 }
 
 QFrame#IdleMessage QPushButton {
-    border: none;
+    /*border: none;*/
     color: rgba(255, 27, 0, 200);
     font-size: 200px;
     text-align: center;
@@ -50,6 +50,20 @@ QFrame#IdleMessage QPushButton {
 QFrame#IdleMessage QPushButton:pressed {
     background-color: rgba(255, 27, 0, 200);
     color: #eeeeee;
+}
+
+/* Slideshow Screen */
+
+QFrame#SlideshowMessage {
+    margin: 30px;
+}
+
+QFrame#SlideshowMessage QPushButton {
+    border: none;
+    color: rgba(255, 27, 0, 200);
+    font-size: 180px;
+    text-align: center;
+    min-height: 550px;
 }
 
 /* Greeter Screen */

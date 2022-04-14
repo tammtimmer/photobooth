@@ -50,8 +50,9 @@ class Gpio:
             trigger_pin = config.getInt('Gpio', 'trigger_pin')
             exit_pin = config.getInt('Gpio', 'exit_pin')
             
-            self._gpio.setButton(trigger_pin, self.trigger)
-            self._gpio.setButton(exit_pin, self.exit)
+            self._gpio.setTriggerButton(trigger_pin, self.triggerEvent)
+            self._gpio.setExitButton(exit_pin, trigger_handler = self.triggerEvent, 
+                                               exit_handler = self.exitEvent)
             
             logging.info(('GPIO enabled (trigger_pin=%d, '
                           'exit_pin=%d)'), trigger_pin, exit_pin)
@@ -147,14 +148,15 @@ class Gpio:
             # Note: blinking forever instead of countdown_time to overcome
             # the issue of too slow preview
 
-    def trigger(self):
+    def triggerEvent(self):
 
         if self._is_trigger:
             self.disableTrigger()
             self._comm.send(Workers.MASTER, StateMachine.GpioEvent('trigger'))
 
-    def exit(self):
+    def exitEvent(self):
 
+        self.disableTrigger()
         self._comm.send(
             Workers.MASTER,
             StateMachine.TeardownEvent(StateMachine.TeardownEvent.WELCOME))
@@ -227,11 +229,20 @@ class Entities:
         for l in self._rgb:
             l.off()
 
-    def setButton(self, bcm_pin, handler):
+    def setTriggerButton(self, bcm_pin, trigger_handler):
 
         try:
             self._buttons.append(self.Button(bcm_pin))
-            self._buttons[-1].when_pressed = handler
+            self._buttons[-1].when_pressed = trigger_handler
+        except self.GPIOPinInUse:
+            logging.error('Pin {} already in use!'.format(bcm_pin))
+
+    def setExitButton(self, bcm_pin, trigger_handler, exit_handler):
+
+        try:
+            self._buttons.append(self.Button(pin=bcm_pin, hold_time = 5))
+            self._buttons[-1].when_released = trigger_handler
+            self._buttons[-1].when_held = exit_handler
         except self.GPIOPinInUse:
             logging.error('Pin {} already in use!'.format(bcm_pin))
 

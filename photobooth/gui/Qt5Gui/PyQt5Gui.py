@@ -213,12 +213,12 @@ class PyQt5Gui(GuiSkeleton):
         logging.info('Start Slideshow')
 
         logging.info('Picture Time {}'.format(view_time) )
-        # self._timerViewSlides.timeout.connect(lambda: self._comm.send(Workers.GUI, GuiEvent('updateslideshow')))
+
         self._timerViewSlides.setSingleShot(False)
         self._timerViewSlides.start(view_time)
         
         picturename = self._pic_list.getRandomPic()
-        logging.info('Picture name for slideshow {}'.format(picturename) )
+        logging.info('Initial picture name for slideshow {}'.format(picturename) )
         if (self._pic_list.counter == 0) :
             picture = Image.new('RGB',self._default_size,(128,128,128))
             text = _('No slideshow yet...')
@@ -227,14 +227,14 @@ class PyQt5Gui(GuiSkeleton):
                 picturename = self._pic_list.getRandomPic()
             picture = Image.open(picturename)
             text = ('')
-        self._lastslide = picture
-        self._setWidget(Frames.SlideshowMessage(picture,text))
+        # self._lastslide = picture
+        self._setWidget(Frames.SlideshowMessage(picture,text,
+                                                lambda: self._comm.send(Workers.MASTER, GuiEvent('trigger'))))
         
     def updateSlideshow(self, event):
         
         picturename = self._pic_list.getRandomPic()
-        logging.info('Picture name for slideshow {}'.format(picturename) )
-        # logging.info('Timer-ID "{}" \n '.format(self._timerViewSlides.timerId() ))
+        logging.debug('Picture name for slideshow {}'.format(picturename) )
         if (self._pic_list.counter == 0) :
             picture = Image.new('RGB',self._default_size,(128,128,128))
         else :
@@ -242,12 +242,11 @@ class PyQt5Gui(GuiSkeleton):
                 picturename = self._pic_list.getRandomPic()
             picture = Image.open(picturename)
             
-        logging.info('Alpha {}'.format(round(self._gui.centralWidget().alpha,1)))
         self._gui.centralWidget().alpha = 0.0
         self._gui.centralWidget().slide = picture
         self._gui.centralWidget().update()
         
-        self._lastslide = picture
+        # self._lastslide = picture
         
     def showGreeter(self, state):
 

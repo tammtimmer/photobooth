@@ -192,7 +192,7 @@ class PictureMessage(QtWidgets.QFrame):
 
 class SlideshowMessage(QtWidgets.QFrame):
 
-    def __init__(self, slide, text):
+    def __init__(self, slide, text, trigger_action):
 
         super().__init__()
         self.setObjectName('SlideshowMessage')
@@ -202,13 +202,17 @@ class SlideshowMessage(QtWidgets.QFrame):
         self._lastslide = slide
         self._text = text
         self._alpha = 0.0
-        self.initFrame()
+        self.initFrame(trigger_action)
         
-    def initFrame(self):
+    def initFrame(self, trigger_action):
         
-        lbl = QtWidgets.QLabel(self._text)
+        # lbl = QtWidgets.QLabel(self._text)
+        btn = QtWidgets.QPushButton(self._text)
+        btn.clicked.connect(trigger_action)
+
         lay = QtWidgets.QVBoxLayout()
-        lay.addWidget(lbl)
+        # lay.addWidget(lbl)
+        lay.addWidget(btn)
         self.setLayout(lay)
 
     @property
@@ -239,7 +243,7 @@ class SlideshowMessage(QtWidgets.QFrame):
 
         if self.alpha < 1.0:
             self._newslide = Image.blend(self._lastslide, self.slide, round(self.alpha,1))
-            self.alpha += 0.1
+            self.alpha = round(self.alpha,1) + 0.1
         else:
             self._newslide = self.slide 
             self._lastslide = self.slide 
@@ -249,18 +253,6 @@ class SlideshowMessage(QtWidgets.QFrame):
     def paintEvent(self, event):
 
         painter = QtGui.QPainter(self)
-        
-        # background image
-        #if self.lastslide is not None:
- 
-        #    pix = QtGui.QPixmap.fromImage(self.lastslide)
-        #    pix = pix.scaled(self.contentsRect().size(),
-        #                     QtCore.Qt.KeepAspectRatio,
-        #                     QtCore.Qt.FastTransformation)
-        #    origin = ((self.width() - pix.width()) // 2,
-        #              (self.height() - pix.height()) // 2)
-        #    painter.drawPixmap(QtCore.QPoint(*origin), pix)
-        
 
         slide = ImageQt.ImageQt(self._newslide)
         slide = slide.scaled(self.contentsRect().size(),
