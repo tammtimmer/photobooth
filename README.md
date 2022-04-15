@@ -1,17 +1,15 @@
 # photobooth
 
 This is a fork of the photobooth fork (https://github.com/t0mmo/photobooth). I merged the fancytemplates branch, because I like it.
-I missing a slideshow in case of inactivity. So I added this feature. I do some other changes, too.
+I miss a slideshow in case of inactivity. So I added this feature. I do some other changes, too.
 
 Here is a list:
-
 * add the slideshow 
-* separate GPIO usage - different configuration of push buttons an lights
+* separate GPIO usage - different configuration of push buttons and lights
 * GPIO push buttons changed - two buttons for trigger and a long hold press for exit function
 * added some translations, but only in german 
 
 To do's:
-
 * improve the installation description for raspberry pi debian image bullseye, Qt installation changed a little
 * GPIO buttons for the choice of printing 
 * choice of two templates in the idle state
