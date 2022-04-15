@@ -45,7 +45,7 @@ class CameraDummy(CameraInterface):
 
     def getPicture(self):
 
-        self._hue = (self._hue + 1) % 360
+        self._hue = (self._hue + 15) % 360
         r, g, b = hsv_to_rgb(self._hue / 360, .2, .9)
         return Image.new('RGB', self._size, (int(r * 255), int(g * 255),
                                              int(b * 255)))

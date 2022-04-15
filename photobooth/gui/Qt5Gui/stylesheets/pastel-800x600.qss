@@ -168,9 +168,9 @@ QWidget#PostprocessMessage QPushButton:pressed {
 }
 
 QWidget#PostprocessMessage QPushButton:disabled {
+    color: #66333333;
+    border-color: #66333333;
     background-color: #33eeeeee;
-    color: #11eeeeee;
-    border-color: #11eeeeee;
 }
 
 /* Customizing settings */

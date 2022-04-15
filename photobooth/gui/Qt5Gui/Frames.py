@@ -406,8 +406,12 @@ class PostprocessMessage(Widgets.TransparentOverlay):
     def initFrame(self, tasks, idle_handle, worker):
 
         def disableAndCall(button, handle):
-            button.setEnabled(False)
-            button.update()
+            for i, button in enumerate(self._buttons):
+                logging.info('Button {}'.format(button.text()) )
+                button.setEnabled(False)
+                button.update()
+            self._label.setText(_('print in progress'))
+            self._label.update()
             worker.put(handle)
 
         def createButton(task):
@@ -415,17 +419,18 @@ class PostprocessMessage(Widgets.TransparentOverlay):
             button.clicked.connect(lambda: disableAndCall(button, task.action))
             return button
 
-        buttons = [createButton(task) for task in tasks]
-        buttons.append(QtWidgets.QPushButton(_('Start over')))
-        buttons[-1].clicked.connect(idle_handle)
+        self._buttons = [createButton(task) for task in tasks]
+        self._buttons.append(QtWidgets.QPushButton(_('Start over')))
+        self._buttons[-1].clicked.connect(idle_handle)
 
         button_lay = QtWidgets.QGridLayout()
-        for i, button in enumerate(buttons):
+        for i, button in enumerate(self._buttons):
             pos = divmod(i, 2)
             button_lay.addWidget(button, *pos)
 
         layout = QtWidgets.QVBoxLayout()
-        layout.addWidget(QtWidgets.QLabel(_('Happy?')))
+        self._label = QtWidgets.QLabel(_('Happy?'))
+        layout.addWidget(self._label)
         layout.addLayout(button_lay)
         self.setLayout(layout)
 
