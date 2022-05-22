@@ -13,6 +13,7 @@ To do's:
 * improve the installation description for raspberry pi debian image bullseye, Qt installation changed a little
 * GPIO buttons for the choice of printing 
 * choice of two templates in the idle state
+* preview in the start window
 
 ---
 
