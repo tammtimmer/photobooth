@@ -241,7 +241,8 @@ class SlideshowMessage(QtWidgets.QFrame):
 
     def timerEvent(self, event):
 
-        if self.alpha < 1.0:
+        if ((self.alpha < 1.0) and 
+            (getattr(self._lastslide,"size") == getattr(self.slide,"size"))):
             self._newslide = Image.blend(self._lastslide, self.slide, round(self.alpha,1))
             self.alpha = round(self.alpha,1) + 0.1
         else:
@@ -853,12 +854,12 @@ class Settings(QtWidgets.QFrame):
         self.init('Slideshow')
         
         box_start_slideshow_time = QtWidgets.QSpinBox()
-        box_start_slideshow_time.setRange(0, 100)
+        box_start_slideshow_time.setRange(3, 100)
         box_start_slideshow_time.setValue(self._cfg.getInt('Slideshow', 'start_slideshow_time'))
         self.add('Slideshow', 'start_slideshow_time', box_start_slideshow_time)
 
         box_pic_slideshow_time = QtWidgets.QSpinBox()
-        box_pic_slideshow_time.setRange(0, 100)
+        box_pic_slideshow_time.setRange(5, 100)
         box_pic_slideshow_time.setValue(self._cfg.getInt('Slideshow', 'pic_slideshow_time'))
         self.add('Slideshow', 'pic_slideshow_time', box_pic_slideshow_time)
 

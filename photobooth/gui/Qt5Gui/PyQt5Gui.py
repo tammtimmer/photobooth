@@ -139,6 +139,21 @@ class PyQt5Gui(GuiSkeleton):
          QtCore.QObject.killTimer(self, self._timerStartSlideshow)
          QtCore.QObject.killTimer(self, self._timerViewSlides)
 
+    def _newslideshowPicture (self):
+        
+        if (self._pic_list.counter == 0) :
+            picture = Image.new('RGBA',self._default_size,(128,128,128,0))
+            text = _('No slideshow yet...')
+        else :
+            picturename = self._pic_list.getRandomPic()
+            while (not os.path.isfile(picturename)):
+                picturename = self._pic_list.getRandomPic()
+            logging.debug('Picture name for slideshow {}'.format(picturename) )
+            picture = Image.open(picturename)
+            text = ('')
+            
+        return(picture, text)
+        
     def close(self):
 
         if self._gui.close():
@@ -216,32 +231,34 @@ class PyQt5Gui(GuiSkeleton):
 
         self._timerViewSlides.setSingleShot(False)
         self._timerViewSlides.start(view_time)
+        picture, text = self._newslideshowPicture()
         
-        picturename = self._pic_list.getRandomPic()
-        logging.info('Initial picture name for slideshow {}'.format(picturename) )
-        if (self._pic_list.counter == 0) :
-            picture = Image.new('RGB',self._default_size,(128,128,128))
-            text = _('No slideshow yet...')
-        else :
-            while (not os.path.isfile(picturename)):
-                picturename = self._pic_list.getRandomPic()
-            picture = Image.open(picturename)
-            text = ('')
-        # self._lastslide = picture
+        #if (self._pic_list.counter == 0) :
+        #    picture = Image.new('RGBA',self._default_size,(128,128,128,0))
+        #    text = _('No slideshow yet...')
+        #else :
+        #    picturename = self._pic_list.getRandomPic()
+        #    while (not os.path.isfile(picturename)):
+        #        picturename = self._pic_list.getRandomPic()
+        #    logging.debug('Initial picture name for slideshow {}'.format(picturename) )
+        #    picture = Image.open(picturename)
+        #    text = ('')
+        
         self._setWidget(Frames.SlideshowMessage(picture,text,
                                                 lambda: self._comm.send(Workers.MASTER, GuiEvent('trigger'))))
         
     def updateSlideshow(self, event):
         
-        picturename = self._pic_list.getRandomPic()
-        logging.debug('Picture name for slideshow {}'.format(picturename) )
-        if (self._pic_list.counter == 0) :
-            picture = Image.new('RGB',self._default_size,(128,128,128))
-        else :
-            while (not os.path.isfile(picturename)):
-                picturename = self._pic_list.getRandomPic()
-            picture = Image.open(picturename)
-            
+        #if (self._pic_list.counter == 0) :
+        #    picture = Image.new('RGBA',self._default_size,(128,128,128,0))
+        #else :
+        #    picturename = self._pic_list.getRandomPic()
+        #    while (not os.path.isfile(picturename)):
+        #        picturename = self._pic_list.getRandomPic()
+        #    logging.debug('Picture name for slideshow {}'.format(picturename) )
+        #    picture = Image.open(picturename)
+        
+        picture, text = self._newslideshowPicture()            
         self._gui.centralWidget().alpha = 0.0
         self._gui.centralWidget().slide = picture
         self._gui.centralWidget().update()
