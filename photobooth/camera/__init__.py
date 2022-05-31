@@ -95,8 +95,11 @@ class Camera:
 
         if isinstance(state, StateMachine.StartupState):
             self.startup()
-        elif isinstance(state, StateMachine.GreeterState):
+        elif isinstance(state, StateMachine.IdleState):
             self.prepareCapture()
+            self.capturePreview()
+        # elif isinstance(state, StateMachine.GreeterState):
+        #     self.prepareCapture()
         elif isinstance(state, StateMachine.CountdownState):
             self.capturePreview()
         elif isinstance(state, StateMachine.CaptureState):

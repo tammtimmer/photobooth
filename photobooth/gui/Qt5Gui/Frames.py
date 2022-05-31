@@ -89,8 +89,22 @@ class IdleMessage(QtWidgets.QFrame):
 
         self._message_label = _('Hit the')
         self._message_button = _('Button!')
+        self._picture = None
 
         self.initFrame(trigger_action)
+
+    @property
+    def picture(self):
+
+        return self._picture
+
+    @picture.setter
+    def picture(self, picture):
+
+        if not isinstance(picture, QtGui.QImage):
+            raise ValueError('picture must be a QtGui.QImage')
+
+        self._picture = picture
 
     def initFrame(self, trigger_action):
 
@@ -102,6 +116,24 @@ class IdleMessage(QtWidgets.QFrame):
         lay.addWidget(lbl)
         lay.addWidget(btn)
         self.setLayout(lay)
+
+    def paintEvent(self, event):
+
+        painter = QtGui.QPainter(self)
+
+        # background image
+        if self.picture is not None:
+
+            pix = QtGui.QPixmap.fromImage(self.picture)
+            pix = pix.scaled(int(self.width()//1.9),
+                             int(self.height()//1.9),
+                             QtCore.Qt.KeepAspectRatio,
+                             QtCore.Qt.FastTransformation)
+            origin = ((int(self.width() * 0.05)),
+                      (self.height() - pix.height()) // 2)
+            painter.drawPixmap(QtCore.QPoint(*origin), pix)
+
+        painter.end()
 
 
 class GreeterMessage(QtWidgets.QFrame):

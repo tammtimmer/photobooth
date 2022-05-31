@@ -82,7 +82,7 @@ class GuiSkeleton:
     def handleState(self, state):
 
         if isinstance(state, StateMachine.CameraEvent):
-            self.updateCountdown(state)
+            self.updatePreview(state)
         elif isinstance(state, StateMachine.GuiEvent):
             self.updateSlideshow(state)
         elif isinstance(state, StateMachine.ErrorState):
