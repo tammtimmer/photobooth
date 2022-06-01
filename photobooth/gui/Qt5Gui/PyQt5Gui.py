@@ -57,6 +57,7 @@ class PyQt5Gui(GuiSkeleton):
         self._postprocess = GuiPostprocessor(self._cfg)
 
         self._createTimer()
+
         # Picture naming convention for assembled pictures
         path = os.path.join(config.get('Storage', 'basedir'),
                             config.get('Storage', 'basename'))
@@ -232,32 +233,12 @@ class PyQt5Gui(GuiSkeleton):
         self._timerViewSlides.setSingleShot(False)
         self._timerViewSlides.start(view_time)
         picture, text = self._newslideshowPicture()
-        
-        #if (self._pic_list.counter == 0) :
-        #    picture = Image.new('RGBA',self._default_size,(128,128,128,0))
-        #    text = _('No slideshow yet...')
-        #else :
-        #    picturename = self._pic_list.getRandomPic()
-        #    while (not os.path.isfile(picturename)):
-        #        picturename = self._pic_list.getRandomPic()
-        #    logging.debug('Initial picture name for slideshow {}'.format(picturename) )
-        #    picture = Image.open(picturename)
-        #    text = ('')
-        
+                
         self._setWidget(Frames.SlideshowMessage(picture,text,
                                                 lambda: self._comm.send(Workers.MASTER, GuiEvent('trigger'))))
         
     def updateSlideshow(self, event):
-        
-        #if (self._pic_list.counter == 0) :
-        #    picture = Image.new('RGBA',self._default_size,(128,128,128,0))
-        #else :
-        #    picturename = self._pic_list.getRandomPic()
-        #    while (not os.path.isfile(picturename)):
-        #        picturename = self._pic_list.getRandomPic()
-        #    logging.debug('Picture name for slideshow {}'.format(picturename) )
-        #    picture = Image.open(picturename)
-        
+                
         picture, text = self._newslideshowPicture()            
         self._gui.centralWidget().alpha = 0.0
         self._gui.centralWidget().slide = picture

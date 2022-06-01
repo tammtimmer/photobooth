@@ -35,7 +35,7 @@ class Worker:
     def __init__(self, config, comm):
 
         self._comm = comm
-
+        
         # Picture naming convention for assembled pictures
         path = os.path.join(config.get('Storage', 'basedir'),
                             config.get('Storage', 'basename'))

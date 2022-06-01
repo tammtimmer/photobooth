@@ -21,6 +21,7 @@ import logging
 
 import os.path
 from glob import glob
+from time import localtime, strftime
 
 import random
 
@@ -44,11 +45,23 @@ class PictureList:
         self.counter = 0
         self.shot_counter = 0
 
-        # Ensure directory exists
+        # Ensure directory exists 
         dirname = os.path.dirname(self.basename)
+        logging.info('Dirname {}'.format(dirname))
         if not os.path.exists(dirname):
-            os.makedirs(dirname)
-
+            # Create default directory if basename don't work
+            try: 
+                os.makedirs(dirname)
+            except OSError as error:
+                logging.info('Dirname {} not possible.'.format(dirname))
+                path = os.path.join("%Y-%m-%d",
+                                    os.path.basename(self.basename))
+                self.basename = strftime(path, localtime())
+                dirname = os.path.dirname(self.basename)
+                logging.info('New dirname {}'.format(dirname))
+                if not os.path.exists(dirname):
+                    os.makedirs(dirname)
+                
         self.findExistingFiles()
         
         # Print initial infos
@@ -77,6 +90,11 @@ class PictureList:
         """Return the basename for the files"""
         return self._basename
 
+    @basename.setter
+    def basename(self, basename):
+        logging.info('New basename is {}'.format(basename))
+        self._basename = basename
+        
     def getFilename(self, count):
         """Return the file name for a given file number"""
         return self.basename + str(count).zfill(self.count_width) + self.suffix
