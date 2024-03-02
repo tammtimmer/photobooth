@@ -21,6 +21,7 @@ import logging
 import os
 import subprocess
 import sys
+import time
 
 from PyQt5 import QtCore
 from PyQt5 import QtGui
@@ -446,6 +447,7 @@ class PostprocessMessage(Widgets.TransparentOverlay):
             self._label.setText(_('print in progress'))
             self._label.update()
             worker.put(handle)
+            #time.sleep(5)
 
         def createButton(task):
             button = QtWidgets.QPushButton(task.label)
